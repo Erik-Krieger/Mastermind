@@ -16,6 +16,20 @@ namespace Mastermind
             m_LookupTable = CountChars(m_TargetValue);
         }
 
+        /// <summary>
+        ///     Provides external access to the Target Value.
+        /// </summary>
+        /// <returns></returns>
+        public string GetTargetValue()
+        {
+            return m_TargetValue;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="theString"></param>
+        /// <returns></returns>
         public static Dictionary<char, int> CountChars(string theString)
         {
             if (theString == null)
@@ -38,6 +52,11 @@ namespace Mastermind
             return aDict;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="theLength"></param>
+        /// <returns></returns>
         public static string GenerateTargetValue(int theLength)
         {
             Random aRng = new();
@@ -52,11 +71,18 @@ namespace Mastermind
             return aGeneratedValue;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="theAttempt"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         public bool Parse(string theAttempt)
         {
             if (theAttempt == null)
             {
-                throw new ArgumentNullException("The 'theAttempt' parameter cannot be null");
+                throw new ArgumentNullException(nameof(theAttempt), "The 'theAttempt' parameter cannot be null");
             }
 
             if (theAttempt.Length != m_TargetValue.Length)
@@ -70,7 +96,9 @@ namespace Mastermind
                 throw new ArgumentException("You're only allowed to input digits");
             }
 
-            Dictionary<char, int> aLocalCopyOfDict = new(m_LookupTable); 
+            // Create a local copy of the character count dict.
+            Dictionary<char, int> aLocalCopyOfDict = new(m_LookupTable);
+            bool isCorrectGuess = true;
 
             for (int aIdx = 0; aIdx<theAttempt.Length; aIdx++)
             {
@@ -80,6 +108,7 @@ namespace Mastermind
                 if (!aLocalCopyOfDict.TryGetValue(aCurrentChar, out int aCharCount) || aCharCount < 1)
                 {
                     PrintColoredChar(aCurrentChar, ConsoleColor.DarkGray);
+                    isCorrectGuess = false;
                     continue;
                 }
 
@@ -90,6 +119,7 @@ namespace Mastermind
                 else
                 {
                     PrintColoredChar(aCurrentChar, ConsoleColor.Yellow);
+                    isCorrectGuess = false;
                 }
 
                 // Decrement the remaining character count.
@@ -97,9 +127,8 @@ namespace Mastermind
             }
 
             Console.WriteLine();
-            Console.WriteLine(m_TargetValue);
 
-            return false;
+            return isCorrectGuess;
         }
 
         /// <summary>

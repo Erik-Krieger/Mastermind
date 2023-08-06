@@ -36,6 +36,7 @@ namespace Mastermind
 
                 // Check for actual value
                 if (int.TryParse(aLine, out var aValue) && aValue > 0) {
+                    Console.WriteLine();
                     return aValue;
                 }
 
@@ -49,7 +50,7 @@ namespace Mastermind
         /// <param name="theGame"></param>
         public static void RunGameLoop(Game theGame)
         {
-            Console.WriteLine("Enter your guess");
+            Console.WriteLine("Enter your guess:");
 
             while (true)
             {
@@ -66,7 +67,10 @@ namespace Mastermind
 
                 try
                 {
-                    theGame.Parse(aLine);
+                    if (theGame.Parse(aLine))
+                    {
+                        break;
+                    }
                 }
                 catch (ArgumentNullException e)
                 {
@@ -84,6 +88,8 @@ namespace Mastermind
 
                 Console.WriteLine();
             }
+
+            Console.WriteLine($"\nYou got it, the correct answer was {theGame.GetTargetValue()}");
         }
     }
 }
