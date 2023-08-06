@@ -6,12 +6,21 @@ using System.Threading.Tasks;
 
 namespace Mastermind
 {
+    public enum GameType
+    {
+        None,
+        Numbers,
+        Words,
+    }
+
     internal class Game
     {
         public string m_TargetValue;
         private readonly Dictionary<char, int> m_LookupTable;
+        private readonly GameType m_GameType;
 
-        public Game(int theLength) { 
+        public Game(GameType theType, int theLength) {
+            m_GameType = theType;
             m_TargetValue = GenerateTargetValue(theLength);
             m_LookupTable = CountChars(m_TargetValue);
         }
@@ -57,8 +66,13 @@ namespace Mastermind
         /// </summary>
         /// <param name="theLength"></param>
         /// <returns></returns>
-        public static string GenerateTargetValue(int theLength)
+        public string GenerateTargetValue(int theLength)
         {
+            if (m_GameType == GameType.Words)
+            {
+                return WordService.GetWord(theLength);
+            }
+
             Random aRng = new();
             string aGeneratedValue = string.Empty;
 
@@ -90,15 +104,13 @@ namespace Mastermind
                 throw new ArgumentException($"The length of the guess has to be equal to the number of characters provided in the beginning. ({m_TargetValue.Length})");
             }
 
-            // Make sure that all Characters are digits.
-            bool isAllNum = theAttempt.All(char.IsAsciiDigit);
-            if (!isAllNum) {
-                throw new ArgumentException("You're only allowed to input digits");
-            }
+            // Make sure that the input is valid for the selected game type.
+            ValidateInput(ref theAttempt);
 
             // Create a local copy of the character count dict.
             Dictionary<char, int> aLocalCopyOfDict = new(m_LookupTable);
             bool isCorrectGuess = true;
+            theAttempt = theAttempt.ToUpper();
 
             for (int aIdx = 0; aIdx<theAttempt.Length; aIdx++)
             {
@@ -129,6 +141,38 @@ namespace Mastermind
             Console.WriteLine();
 
             return isCorrectGuess;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="theInput"></param>
+        /// <returns></returns>
+        private void ValidateInput(ref string theInput)
+        {
+            if (theInput == null)
+            {
+                throw new ArgumentNullException(nameof(theInput), "theInput cannot be null, something has gone terribly wrong.");
+            }
+
+            if (m_GameType == GameType.Numbers)
+            {
+                // Make sure that all Characters are digits.
+                bool isAllNum = theInput.All(char.IsAsciiDigit);
+                if (!isAllNum)
+                {
+                    throw new ArgumentException("You're only allowed to input digits.");
+                }
+            }
+            else if (m_GameType == GameType.Words)
+            {
+                // Make sure that all Characters are letters.
+                bool isAllLetters = theInput.All(char.IsLetter);
+                if (!isAllLetters)
+                {
+                    throw new ArgumentException("You're only allowed to input words.");
+                }
+            }
         }
 
         /// <summary>

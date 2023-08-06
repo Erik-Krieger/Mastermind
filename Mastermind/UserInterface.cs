@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Mastermind
 {
@@ -10,13 +11,54 @@ namespace Mastermind
     {
         public UserInterface() { }
 
+        public static GameType QueryGameType()
+        {
+            Console.WriteLine("Which gamemode would you like to play?");
+            Console.WriteLine("Your options: 'numbers', 'words', 'quit'");
+
+            while (true)
+            {
+                var aLine = Console.ReadLine();
+
+                if (aLine == null)
+                {
+                    continue;
+                }
+
+                aLine = aLine.ToLower();
+
+                if (aLine == "quit" || aLine == "exit")
+                {
+                    return GameType.None;
+                }
+
+                if (aLine == "numbers" || aLine == "n")
+                {
+                    return GameType.Numbers;
+                }
+
+                if (aLine == "words" || aLine == "w")
+                {
+                    return GameType.Words;
+                }
+
+                Console.WriteLine("Invalid Input. Only use 'words', 'numbers' or 'quit'");
+                Console.WriteLine("Which gamemode would you like to play?");
+            }
+        }
+
         /// <summary>
         ///     Queries the user for the amount of characters to use.
         /// </summary>
         /// <returns></returns>
-        public static int GetCharacterCount()
+        public static int QueryCharacterCount(GameType theGameType)
         {
             Console.WriteLine("Enter the amount of Characters you want:");
+
+            if (theGameType == GameType.Words)
+            {
+                Console.WriteLine("The word gamemode is limited to the range of 3-22 letters.");
+            }
 
             while (true)
             {
@@ -36,6 +78,12 @@ namespace Mastermind
 
                 // Check for actual value
                 if (int.TryParse(aLine, out var aValue) && aValue > 0) {
+                    if (theGameType == GameType.Words && (aValue < 3 || aValue > 22))
+                    {
+                        Console.WriteLine("You have to choose a length between 3 and 22.");
+                        continue;
+                    }
+
                     Console.WriteLine();
                     return aValue;
                 }

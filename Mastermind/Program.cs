@@ -4,10 +4,17 @@
     {
         public static void Main()
         {
-            Console.WriteLine("Mastermind V1");
+            Console.WriteLine("Mastermind v2\n");
 
-            int aCharacterCount = UserInterface.GetCharacterCount();
-            Game aGame = new(aCharacterCount);
+            GameType aGameType = UserInterface.QueryGameType();
+            if (aGameType == GameType.None)
+            {
+                return;
+            }
+
+            int aCharacterCount = UserInterface.QueryCharacterCount(aGameType);
+
+            Game aGame = new(aGameType, aCharacterCount);
             UserInterface.RunGameLoop(aGame);
         }
 
